@@ -32,6 +32,8 @@ def source(config):  # pylint:disable=unused-argument
                              validator={'__parent__': or_(seps_before, seps_after)})
 
     rip_prefix = '(?P<other>Rip)-?'
+    remux_prefix = '(?P<other>Remux)-?'
+    remux_suffix = '-?(?P<other>Remux)'
     rip_suffix = '-?(?P<other>Rip)'
     rip_optional_suffix = '(?:' + rip_suffix + ')?'
 
@@ -91,27 +93,29 @@ def source(config):  # pylint:disable=unused-argument
                  value={'source': 'Video on Demand', 'other': 'Rip'})
 
     rebulk.regex(*build_source_pattern('WEB', 'WEB-?DL', suffix=rip_suffix),
-                 value={'source': 'Web', 'other': 'Rip'})
+                 value={'source': 'WEBRip'})
     rebulk.regex(*build_source_pattern('HD', 'FHD-?', suffix=rip_suffix),
-                 value={'source': 'HD', 'other': 'Rip'})
+                 value={'source': 'HDRip'})
     # WEBCap is a synonym to WEBRip, mostly used by non english
     rebulk.regex(*build_source_pattern('WEB-?(?P<another>Cap)', suffix=rip_optional_suffix),
                  value={'source': 'Web', 'other': 'Rip', 'another': 'Rip'})
     rebulk.regex(*build_source_pattern('WEB-?DL', 'WEB-?U?HD', 'DL-?WEB', 'DL(?=-?Mux)'),
-                 value={'source': 'Web'})
+                 value={'source': 'WEB-DL'})
     rebulk.regex('(WEB)', value='Web', tags='weak.source')
 
     rebulk.regex(*build_source_pattern('HD-?DVD', suffix=rip_optional_suffix),
                  value={'source': 'HD-DVD', 'other': 'Rip'})
 
     rebulk.regex(*build_source_pattern('Blu-?ray', 'BD', 'BD[59]', 'BD25', 'BD50', suffix=rip_optional_suffix),
-                 value={'source': 'Blu-ray', 'other': 'Rip'})
+                 value={'source': 'BluRay', 'other': 'Rip'})
+    rebulk.regex(*build_source_pattern('Blu-?ray', 'BD', 'BD[59]', 'BD25', 'BD50', suffix=remux_suffix),
+                 value={'source': 'BluRay Remux'})
     rebulk.regex(*build_source_pattern('(?P<another>BR)-?(?=Scr(?:eener)?)', '(?P<another>BR)-?(?=Mux)'),  # BRRip
-                 value={'source': 'Blu-ray', 'another': 'Reencoded'})
+                 value={'source': 'BRRip', 'another': 'Reencoded'})
     rebulk.regex(*build_source_pattern('(?P<another>BR)', suffix=rip_suffix),  # BRRip
-                 value={'source': 'Blu-ray', 'other': 'Rip', 'another': 'Reencoded'})
+                 value={'source': 'BRRip', 'other': 'Rip', 'another': 'Reencoded'})
 
-    rebulk.regex(*build_source_pattern('Ultra-?Blu-?ray', 'Blu-?ray-?Ultra'), value='Ultra HD Blu-ray')
+    rebulk.regex(*build_source_pattern('Ultra-?Blu-?ray', 'Blu-?ray-?Ultra'), value='UHD BluRay')
 
     rebulk.regex(*build_source_pattern('AHDTV'), value='Analog HDTV')
     rebulk.regex(*build_source_pattern('UHD-?TV', suffix=rip_optional_suffix), conflict_solver=demote_other,
@@ -172,7 +176,7 @@ class UltraHdBlurayRule(Rule):
                     other.private = True
 
                 new_source = copy.copy(match)
-                new_source.value = 'Ultra HD Blu-ray'
+                new_source.value = 'UHD Bluray'
                 to_remove.append(match)
                 to_append.append(new_source)
 
