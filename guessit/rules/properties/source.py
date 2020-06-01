@@ -92,6 +92,8 @@ def source(config):  # pylint:disable=unused-argument
 
     rebulk.regex(*build_source_pattern('WEB', 'WEB-?DL', suffix=rip_suffix),
                  value={'source': 'Web', 'other': 'Rip'})
+    rebulk.regex(*build_source_pattern('HD', 'FHD-?', suffix=rip_suffix),
+                 value={'source': 'HD', 'other': 'Rip'})
     # WEBCap is a synonym to WEBRip, mostly used by non english
     rebulk.regex(*build_source_pattern('WEB-?(?P<another>Cap)', suffix=rip_optional_suffix),
                  value={'source': 'Web', 'other': 'Rip', 'another': 'Rip'})
